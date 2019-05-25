@@ -159,7 +159,9 @@ function deserialize_global_from_main(s::ClusterSerializer, sym)
     sym_isconst = deserialize(s)
     v = deserialize(s)
     if sym_isconst
-        ccall(:jl_set_const, Cvoid, (Any, Any, Any), Main, sym, v)
+        if !isdefined(Main, sym)
+            ccall(:jl_set_const, Cvoid, (Any, Any, Any), Main, sym, v)
+        end
     else
         ccall(:jl_set_global, Cvoid, (Any, Any, Any), Main, sym, v)
     end

@@ -2376,10 +2376,13 @@ JL_DLLEXPORT jl_function_t *jl_get_kwsorter(jl_value_t *ty)
     jl_methtable_t *mt = jl_argument_method_table(ty);
     if ((jl_value_t*)mt == jl_nothing)
         jl_error("cannot get keyword sorter for abstract type");
+    jl_datatype_t *dt = (jl_datatype_t*)jl_argument_datatype(ty);
+    assert(jl_is_datatype(dt));
+    jl_typename_t *tn = dt->name;
     if (!mt->kwsorter) {
         JL_LOCK(&mt->writelock);
         if (!mt->kwsorter) {
-            mt->kwsorter = jl_new_generic_function_with_supertype(mt->name, mt->module, jl_function_type, 1);
+            mt->kwsorter = jl_new_generic_function_with_supertype(tn->name, mt->module, jl_function_type, 1);
             jl_gc_wb(mt, mt->kwsorter);
         }
         JL_UNLOCK(&mt->writelock);
